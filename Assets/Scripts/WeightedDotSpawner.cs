@@ -30,14 +30,14 @@ public class WeightedDotSpawner : DotSpawner
 
 		for (int i = 0; i<weightedDots.Length; i++) 
 		{
-			if(currentWeight <= r)
+			currentWeight += weightedDots[i].weight;
+
+			if(currentWeight >= r)
 			{
 				//todo: use object pool
 				Dot dot = Instantiate(weightedDots[i].prefab.gameObject).GetComponent<Dot>();
 				return dot;
 			}
-
-			currentWeight += weightedDots[i].weight;
 		}
 
 		return null;

@@ -2,8 +2,8 @@
 using System.Collections;
 
 public class Dot : MonoBehaviour {
-	int xPos;
-	int yPos;
+	public int xPos;
+	public int yPos;
 
 	public bool Equals(Object obj)
 	{
@@ -12,7 +12,13 @@ public class Dot : MonoBehaviour {
 			return false;
 		}
 
-		return obj.GetType().Equals (typeof(Dot));
+		Dot p = obj as Dot;
+		if ((Object)p == null)
+		{
+			return false;
+		}
+
+		return p.xPos == xPos && p.yPos == yPos
 	}
 
 	public void SetPosition(int x, int y)
@@ -23,7 +29,7 @@ public class Dot : MonoBehaviour {
 
 	void OnMouseOver() {
 		if (Input.GetMouseButton (0)) {
-			Debug.LogError ("test");
+			DotGameManager.Instance.OnDotSelected(this);
 		}
 	}
 
