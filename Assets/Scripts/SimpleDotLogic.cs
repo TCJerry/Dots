@@ -12,6 +12,11 @@ public class SimpleDotLogic : DotLogic {
 
 	public override void OnDotSelected(Dot dot)
 	{
+		if (selectedDots.Count == 0) 
+		{
+			selectedDots.Add (dot);
+		}
+
 
 	}
 
