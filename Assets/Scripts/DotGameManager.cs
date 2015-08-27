@@ -3,7 +3,6 @@ using System.Collections;
 
 public class DotGameManager : MonoBehaviour {
 	public Board board;
-	public DotLogic logic;
 
 	private static DotGameManager instance;
 	public static DotGameManager Instance
@@ -28,7 +27,6 @@ public class DotGameManager : MonoBehaviour {
 
 	public void OnDotSelected(Dot dot)
 	{
-		logic.OnDotSelected (dot);
-
+		board.OnDotSelected (dot);
 	}
 }

@@ -2,8 +2,14 @@
 using System.Collections;
 
 public class Dot : MonoBehaviour {
-	public int xPos;
-	public int yPos;
+	public int posX;
+	public int posY;
+	public int selected;
+
+	void Awake()
+	{
+		selected = 0;
+	}
 
 	public bool Equals(Object obj)
 	{
@@ -18,13 +24,23 @@ public class Dot : MonoBehaviour {
 			return false;
 		}
 
-		return p.xPos == xPos && p.yPos == yPos
+		return p.posX == posX && p.posY == posY;
+	}
+
+	public bool TypeEquals(Object obj)
+	{
+		if (obj == null)
+		{
+			return false;
+		}
+		
+		return obj.GetType().Equals(typeof(Dot));
 	}
 
 	public void SetPosition(int x, int y)
 	{
-		xPos = x;
-		yPos = y;
+		posX = x;
+		posY = y;
 	}
 
 	void OnMouseOver() {
