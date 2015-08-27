@@ -14,11 +14,13 @@ public class Board : MonoBehaviour {
 
 	DotLogic logic;
 	Dot[,] dots;
+	bool updating;
 
 	void Awake()
 	{
 		dots = new Dot[rows, columns];
-		logic = new SimpleDotLogic (rows, columns);
+		logic = new SimpleDotLogic ();
+		updating = true;
 	}
 
 	public void FillBoard()
@@ -37,6 +39,22 @@ public class Board : MonoBehaviour {
 				dots[i,j].gameObject.transform.localPosition = pos;
 			}
 		}
+
+		while (!logic.HasMoves(dots)) 
+		{
+			ShuffleBoard();
+		}
+
+		updating = false;
+	}
+
+	void ShuffleBoard()
+	{
+		Debug.LogError ("shuffling board");
+		for (int i = 0; i< rows; i++) 
+		{
+
+		}
 	}
 
 	public void OnDotSelected(Dot dot)
@@ -50,7 +68,7 @@ public class Board : MonoBehaviour {
 		{
 			if(dots[x,y] != null)
 			{
-				//remove
+				//todo add back to object pool
 				Destroy(dots[x,y].gameObject);
 				dots[x,y] = null;
 			}
@@ -71,7 +89,7 @@ public class Board : MonoBehaviour {
 		{
 			for(int j = 0; j < columns; j++)
 			{
-				if(dot.TypeEquals(dots[i,j]))
+				if(dot.IsSameDotType(dots[i,j]))
 				{
 					ClearDotAtPos(i,j);
 				}

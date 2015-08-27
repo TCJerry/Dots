@@ -2,85 +2,94 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public enum EdgeStatus
-{
-	NONE,
-	UNUSED,
-	USED
-}
-
 public class SimpleDotLogic : DotLogic {
 	List<Dot> selectedDots;
-	EdgeStatus[,] adjMatrix;
-	int rows;
-	int columns;
-	Dot lastChecked;
+	List<string> selectedEdges;
+	string lastCheckedId;
 
-	public SimpleDotLogic(int rows, int columns)
+	public SimpleDotLogic()
 	{
 		selectedDots = new List<Dot> ();
-		adjMatrix = new EdgeStatus[rows,columns];
-		this.rows = rows;
-		this.columns = columns;
+		selectedEdges = new List<string>();
 	}
 
-	public void OnBoardUpdated(Dot[,] board)
+	public override bool HasMoves(Dot[,] board)
 	{
+		int rows = board.GetLength (0);
+		int columns = board.GetLength (1);
+
 		for (int i = 0; i<rows; i++) 
 		{
 			for(int j = 0; j < columns; j++)
 			{
 				Dot dot = board[i,j];
 
-				if(i-1 >= 0 && board[i-1,j].TypeEquals(dot))
+				if(i+1 < rows && board[i+1,j].IsSameDotType(dot))
 				{
-
+					return true;
 				}
 
-				if(i+1 < rows && board[i+1,j].TypeEquals(dot))
+				if(j+1 < columns && board[i,j+1].IsSameDotType(dot))
 				{
-					
-				}
-
-				if(j-1 >= 0 && board[i,j-1].TypeEquals(dot))
-				{
-					
-				}
-
-				if(j+1 < columns && board[i,j+1].TypeEquals(dot))
-				{
-					
+					return true;
 				}
 			}
 		}
+
+		return false;
 	}
 
 	public override void OnDotSelected(Dot dot)
 	{
-		if (lastChecked != null && lastChecked.Equals (dot)) 
+		if (!string.IsNullOrEmpty(lastCheckedId) && lastCheckedId == dot.id.ToString()) 
 		{
 			return;
 		}
-		Debug.LogError ("dot selected " + dot.posX + " " + dot.posY + " " + dot.selected);
-		lastChecked = dot;
+		Debug.LogError ("dot selected " + dot.posX + " " + dot.posY + " " + dot.Selected);
+		lastCheckedId = dot.id.ToString();
 
 		if (selectedDots.Count == 0) {
 			AddDot (dot);
 		} 
-		else if(selectedDots[0].TypeEquals(dot) && isNeighbor (dot))
+		else if(selectedDots[0].IsSameDotType(dot) && isNeighbor (dot))
 		{
-			if(dot.selected > 0 && selectedDots.Count > 1 && selectedDots[selectedDots.Count-2].Equals(dot))
+			Dot lastDot = selectedDots[selectedDots.Count-1];
+			string edge = dot.id < lastDot.id ? dot.id + ":" + lastDot.id : lastDot.id + ":" + dot.id;
+			int edgeIndex = selectedEdges.IndexOf(edge);
+
+			if(edgeIndex >= 0)
 			{
-				//undo
-				Dot lastDot = selectedDots[selectedDots.Count-1];
-				lastDot.selected--;
-				selectedDots.RemoveAt(selectedDots.Count-1);
+				if(edgeIndex == selectedEdges.Count-1)
+				{
+					UndoLastMove();
+				}
+				return;
 			}
-			else
-			{
-				AddDot (dot);
-			}
+				
+			AddDot (dot, edge);
 		}
+	}
+
+	void AddDot(Dot dot)
+	{
+		Debug.LogError ("AddDot");
+		selectedDots.Add (dot);
+		dot.Selected++;
+	}
+
+	void AddDot(Dot dot, string edge)
+	{
+		AddDot (dot);
+		selectedEdges.Add (edge);
+	}
+
+	void UndoLastMove()
+	{
+		Debug.LogError ("UNDO");
+		Dot lastDot = selectedDots[selectedDots.Count-1];
+		lastDot.Selected--;
+		selectedDots.RemoveAt(selectedDots.Count-1);
+		selectedEdges.RemoveAt (selectedEdges.Count-1);
 	}
 
 	bool isNeighbor(Dot dot)
@@ -89,27 +98,21 @@ public class SimpleDotLogic : DotLogic {
 			Dot prevDot = selectedDots [selectedDots.Count-1];
 			int diffX = dot.posX - prevDot.posX;
 			int diffY = dot.posY - prevDot.posY;
-
+			
 			if(diffX*diffX + diffY*diffY == 1)
 			{
 				return true;
 			}
 		}
-
+		
 		return false;
-	}
-
-	void AddDot(Dot dot)
-	{
-		selectedDots.Add (dot);
-		dot.selected++;
 	}
 
 	bool hasMadeSquare()
 	{
 		for(int i = 0; i < selectedDots.Count; i++)
 		{
-			if(selectedDots[i].selected > 1)
+			if(selectedDots[i].Selected > 1)
 			{
 				return true;
 			}
@@ -132,9 +135,11 @@ public class SimpleDotLogic : DotLogic {
 		} 
 		else if(selectedDots.Count == 1) 
 		{
-			selectedDots[0].selected = 0;
+			selectedDots[0].Selected = 0;
 		}
 
+		lastCheckedId = "";
 		selectedDots.Clear ();
+		selectedEdges.Clear ();
 	}
 }

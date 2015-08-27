@@ -2,32 +2,33 @@
 using System.Collections;
 
 public class Dot : MonoBehaviour {
+	public GameObject selectedIndictor;
+
 	public int posX;
 	public int posY;
-	public int selected;
+	public int id;
+
+	int selected;
+	public int Selected
+	{
+		get
+		{
+			return selected;
+		}
+		set
+		{
+			selected = value;
+			if(selectedIndictor != null)
+				selectedIndictor.SetActive(selected > 0);
+		}
+	}
 
 	void Awake()
 	{
-		selected = 0;
+		Selected = 0;
 	}
 
-	public bool Equals(Object obj)
-	{
-		if (obj == null)
-		{
-			return false;
-		}
-
-		Dot p = obj as Dot;
-		if ((Object)p == null)
-		{
-			return false;
-		}
-
-		return p.posX == posX && p.posY == posY;
-	}
-
-	public bool TypeEquals(Object obj)
+	public virtual bool IsSameDotType(Object obj)
 	{
 		if (obj == null)
 		{
@@ -41,6 +42,7 @@ public class Dot : MonoBehaviour {
 	{
 		posX = x;
 		posY = y;
+		id = (posX + "," + posY).GetHashCode();
 	}
 
 	void OnMouseOver() {
