@@ -29,4 +29,11 @@ public class DotGameManager : MonoBehaviour {
 	{
 		board.OnDotSelected (dot);
 	}
+
+	void Update() {
+		if (Input.GetMouseButtonUp (0)) 
+		{
+			board.OnInputComplete ();
+		}
+	}
 }

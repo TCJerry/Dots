@@ -15,21 +15,23 @@ public class SimpleDotLogic : DotLogic {
 
 	public override bool HasMoves(Dot[,] board)
 	{
-		int rows = board.GetLength (0);
-		int columns = board.GetLength (1);
+		int columns = board.GetLength (0);
+		int rows = board.GetLength (1);
 
-		for (int i = 0; i<rows; i++) 
+		Debug.LogError ("has moves " + rows + " " + columns);
+
+		for (int i = 0; i<columns; i++) 
 		{
-			for(int j = 0; j < columns; j++)
+			for(int j = 0; j < rows; j++)
 			{
 				Dot dot = board[i,j];
 
-				if(i+1 < rows && board[i+1,j].IsSameDotType(dot))
+				if(i+1 < columns && board[i+1,j].IsSameDotType(dot))
 				{
 					return true;
 				}
 
-				if(j+1 < columns && board[i,j+1].IsSameDotType(dot))
+				if(j+1 < rows && board[i,j+1].IsSameDotType(dot))
 				{
 					return true;
 				}
@@ -45,7 +47,7 @@ public class SimpleDotLogic : DotLogic {
 		{
 			return;
 		}
-		Debug.LogError ("dot selected " + dot.posX + " " + dot.posY + " " + dot.Selected);
+
 		lastCheckedId = dot.id.ToString();
 
 		if (selectedDots.Count == 0) {
