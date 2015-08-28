@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class DotLogic {
-	public abstract bool HasMoves(Dot[,] board);
+public abstract class Board : MonoBehaviour {
+
+	public abstract void InitBoard();
 
 	public abstract void OnDotSelected(Dot dot);
 

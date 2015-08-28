@@ -2,61 +2,67 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class SimpleDotLogic : DotLogic {
-	List<Dot> selectedDots;
+public class Grid2DDotLogic : DotLogic {
 	List<string> selectedEdges;
 	string lastCheckedId;
 
-	public SimpleDotLogic()
+	public Grid2DDotLogic()
 	{
 		selectedDots = new List<Dot> ();
 		selectedEdges = new List<string>();
 	}
 
-	public override bool HasMoves(Dot[,] board)
+	public override Solvability CheckSolvability(Dot[,] board)
 	{
 		int columns = board.GetLength (0);
 		int rows = board.GetLength (1);
-
-		Debug.LogError ("has moves " + rows + " " + columns);
+		HashSet<string> dotTypeSet = new HashSet<string>();
 
 		for (int i = 0; i<columns; i++) 
 		{
 			for(int j = 0; j < rows; j++)
 			{
 				Dot dot = board[i,j];
+				dotTypeSet.Add(dot.GetDotType());
 
-				if(i+1 < columns && board[i+1,j].IsSameDotType(dot))
+				if(i+1 < columns && board[i+1,j].GetDotType() == dot.GetDotType())
 				{
-					return true;
+					return Solvability.HAS_MOVES;
 				}
 
-				if(j+1 < rows && board[i,j+1].IsSameDotType(dot))
+				if(j+1 < rows && board[i,j+1].GetDotType() == dot.GetDotType())
 				{
-					return true;
+					return Solvability.HAS_MOVES;
 				}
 			}
 		}
 
-		return false;
+		if (columns * rows <= dotTypeSet.Count) 
+		{
+			return Solvability.UNSOLVABLE;
+		} 
+		else 
+		{
+			return Solvability.NO_MOVES;
+		}
 	}
 
 	public override void OnDotSelected(Dot dot)
 	{
-		if (!string.IsNullOrEmpty(lastCheckedId) && lastCheckedId == dot.id.ToString()) 
+		if (!string.IsNullOrEmpty(lastCheckedId) && lastCheckedId == dot.Index.ToString()) 
 		{
 			return;
 		}
 
-		lastCheckedId = dot.id.ToString();
+		lastCheckedId = dot.Index.ToString();
 
 		if (selectedDots.Count == 0) {
 			AddDot (dot);
 		} 
-		else if(selectedDots[0].IsSameDotType(dot) && isNeighbor (dot))
+		else if(selectedDots[0].GetDotType() == dot.GetDotType() && isNeighbor (dot))
 		{
 			Dot lastDot = selectedDots[selectedDots.Count-1];
-			string edge = dot.id < lastDot.id ? dot.id + ":" + lastDot.id : lastDot.id + ":" + dot.id;
+			string edge = dot.Index < lastDot.Index ? dot.Index + ":" + lastDot.Index : lastDot.Index + ":" + dot.Index;
 			int edgeIndex = selectedEdges.IndexOf(edge);
 
 			if(edgeIndex >= 0)
@@ -74,7 +80,6 @@ public class SimpleDotLogic : DotLogic {
 
 	void AddDot(Dot dot)
 	{
-		Debug.LogError ("AddDot");
 		selectedDots.Add (dot);
 		dot.Selected++;
 	}
@@ -87,7 +92,7 @@ public class SimpleDotLogic : DotLogic {
 
 	void UndoLastMove()
 	{
-		Debug.LogError ("UNDO");
+		Debug.Log ("Undo");
 		Dot lastDot = selectedDots[selectedDots.Count-1];
 		lastDot.Selected--;
 		selectedDots.RemoveAt(selectedDots.Count-1);
@@ -98,8 +103,8 @@ public class SimpleDotLogic : DotLogic {
 	{
 		if (selectedDots.Count > 0) {
 			Dot prevDot = selectedDots [selectedDots.Count-1];
-			int diffX = dot.posX - prevDot.posX;
-			int diffY = dot.posY - prevDot.posY;
+			int diffX = dot.PosX - prevDot.PosX;
+			int diffY = dot.PosY - prevDot.PosY;
 			
 			if(diffX*diffX + diffY*diffY == 1)
 			{
@@ -110,7 +115,7 @@ public class SimpleDotLogic : DotLogic {
 		return false;
 	}
 
-	bool hasMadeSquare()
+	public override bool HasMadeSquare()
 	{
 		for(int i = 0; i < selectedDots.Count; i++)
 		{
@@ -125,17 +130,7 @@ public class SimpleDotLogic : DotLogic {
 
 	public override void OnInputComplete()
 	{
-		if (selectedDots.Count > 1) {
-			if (hasMadeSquare ())
-			{
-				DotGameManager.Instance.board.ClearAllDotsOfType (selectedDots[0]);
-			}
-			else
-			{
-				DotGameManager.Instance.board.ClearDots (selectedDots);
-			}
-		} 
-		else if(selectedDots.Count == 1) 
+		if(selectedDots.Count == 1) 
 		{
 			selectedDots[0].Selected = 0;
 		}

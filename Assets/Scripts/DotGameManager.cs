@@ -22,7 +22,7 @@ public class DotGameManager : MonoBehaviour {
 
 	void Start()
 	{
-		board.FillBoard();
+		board.InitBoard();
 	}
 
 	public void OnDotSelected(Dot dot)

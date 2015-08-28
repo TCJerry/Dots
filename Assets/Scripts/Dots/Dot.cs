@@ -4,9 +4,32 @@ using System.Collections;
 public class Dot : MonoBehaviour {
 	public GameObject selectedIndictor;
 
-	public int posX;
-	public int posY;
-	public int id;
+	int posX;
+	public int PosX
+	{
+		get
+		{
+			return posX;
+		}
+	}
+
+	int posY;
+	public int PosY
+	{
+		get
+		{
+			return posY;
+		}
+	}
+
+	int index;
+	public int Index
+	{
+		get
+		{
+			return index;
+		}
+	}
 
 	int selected;
 	public int Selected
@@ -32,21 +55,16 @@ public class Dot : MonoBehaviour {
 		targetPosition = transform.localPosition;
 	}
 
-	public virtual bool IsSameDotType(Object obj)
-	{
-		if (obj == null)
-		{
-			return false;
-		}
-		
-		return obj.GetType().Equals(typeof(Dot));
+	public virtual string GetDotType()
+	{	
+		return GetType().ToString();
 	}
 
 	public void SetPosition(int x, int y)
 	{
 		posX = x;
 		posY = y;
-		id = (posX + "," + posY).GetHashCode();
+		index = (posX + "," + posY).GetHashCode();
 	}
 
 	public void TranslateTo(Vector3 position, float speed)
